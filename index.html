@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stratégie d’endurance GT7 – Choix du circuit</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Stratégie d’endurance GT7</h1>
+  <p>Cinq étapes : circuit, durée de la course, passage au stand et carburant, performances des pneus, puis stratégie.</p>
+</header>
+<main class="layout">
+  <section class="picker" aria-labelledby="picker-title">
+    <h2 id="picker-title">Circuits</h2>
+    <label for="search">Rechercher un circuit, un tracé ou un pays</label>
+    <input id="search" type="search" autocomplete="off" placeholder="Ex. : Spa, Japon, Nordschleife">
+    <p id="count" class="muted" aria-live="polite"></p>
+    <div id="circuit-list" class="list"></div>
+  </section>
+  <section class="detail" aria-labelledby="detail-title">
+    <h2 id="detail-title">Votre circuit</h2>
+    <p id="empty" class="empty">Aucun circuit sélectionné. Choisissez-en un dans la liste.</p>
+    <div id="detail" hidden>
+      <p id="sel-circuit" class="sel-circuit"></p>
+      <p id="sel-layout" class="sel-layout"></p>
+      <p id="sel-source" class="muted"></p>
+      <p class="official">Longueur officielle : <strong id="official"></strong></p>
+      <label for="length">Longueur utilisée pour la stratégie (km)</label>
+      <div class="row">
+        <input id="length" type="text" inputmode="decimal" autocomplete="off" aria-describedby="length-msg">
+        <button id="reset" type="button">Rétablir la longueur officielle</button>
+      </div>
+      <p id="length-msg" class="msg" role="alert"></p>
+      <p id="summary" class="summary"></p>
+    </div>
+  </section>
+  <section class="race" aria-labelledby="race-title">
+    <h2 id="race-title">Durée de la course</h2>
+    <p id="race-locked" class="empty">Choisissez d’abord un circuit pour définir la durée de la course.</p>
+    <div id="race-form" hidden>
+      <fieldset>
+        <legend>Comment la course se termine-t-elle ?</legend>
+        <label class="radio"><input type="radio" name="mode" id="mode-duration" value="duration"> À la durée (en minutes)</label>
+        <label class="radio"><input type="radio" name="mode" id="mode-laps" value="laps"> Au nombre de tours</label>
+      </fieldset>
+      <div id="duration-block">
+        <label for="duration">Durée en minutes (vous pouvez aussi écrire 1h30)</label>
+        <input id="duration" type="text" inputmode="numeric" autocomplete="off" aria-describedby="duration-msg">
+        <p id="duration-msg" class="msg" role="alert"></p>
+        <p class="muted">Durées courantes :</p>
+        <div id="presets" class="presets"></div>
+      </div>
+      <div id="laps-block" hidden>
+        <label for="laps">Nombre de tours</label>
+        <input id="laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="laps-msg">
+        <p id="laps-msg" class="msg" role="alert"></p>
+        <div class="distance" aria-live="polite">
+          <p class="distance-label">Distance totale à parcourir</p>
+          <p id="distance-value" class="distance-value"></p>
+          <p id="distance-detail" class="muted"></p>
+        </div>
+      </div>
+      <p id="race-summary" class="summary"></p>
+    </div>
+  </section>
+  <section class="pit" aria-labelledby="pit-title">
+    <h2 id="pit-title">Passage au stand et carburant</h2>
+    <p class="muted">Ces valeurs dépendent de votre voiture et de vos réglages : mesurez-les dans le jeu.</p>
+    <div class="fields">
+      <div class="field">
+        <label for="pit-time">Temps total d’un passage au stand (secondes)</label>
+        <input id="pit-time" type="text" inputmode="decimal" autocomplete="off" aria-describedby="pit-time-hint pit-time-msg">
+        <p id="pit-time-hint" class="hint">Sans le ravitaillement ni le changement de pneus : ils sont comptés à part. Exemple : 25 ou 0:25.</p>
+        <p id="pit-time-msg" class="msg" role="alert"></p>
+      </div>
+      <div class="field">
+        <label for="tire-time">Temps additionnel si changement de pneus (secondes)</label>
+        <input id="tire-time" type="text" inputmode="decimal" autocomplete="off" aria-describedby="tire-time-hint tire-time-msg">
+        <p id="tire-time-hint" class="hint">Temps ajouté au passage au stand. Entrez 0 s’il n’y en a pas.</p>
+        <p id="tire-time-msg" class="msg" role="alert"></p>
+      </div>
+      <div class="field">
+        <label for="fill-rate">Vitesse de remplissage du réservoir (litres par seconde)</label>
+        <input id="fill-rate" type="text" inputmode="decimal" autocomplete="off" aria-describedby="fill-rate-hint fill-rate-msg">
+        <p id="fill-rate-hint" class="hint">Pour un réservoir de 100 litres : 2,5 L/s remplit 2,5 % du réservoir par seconde.</p>
+        <p id="fill-rate-msg" class="msg" role="alert"></p>
+      </div>
+      <div class="field">
+        <label for="consumption">Consommation moyenne par tour (litres pour un réservoir de 100 litres)</label>
+        <input id="consumption" type="text" inputmode="decimal" autocomplete="off" aria-describedby="consumption-hint consumption-msg">
+        <p id="consumption-hint" class="hint">Équivaut au pourcentage de réservoir consommé par tour : 2,5 = 2,5 % par tour.</p>
+        <p id="consumption-msg" class="msg" role="alert"></p>
+      </div>
+    </div>
+    <p id="pit-status" class="status" aria-live="polite"></p>
+    <div id="pit-derived-box" class="derived" hidden>
+      <p class="distance-label">Vérification des valeurs</p>
+      <ul id="pit-derived"></ul>
+    </div>
+  </section>
+  <section class="tires" aria-labelledby="tires-title">
+    <h2 id="tires-title">Performances des pneus</h2>
+    <p class="muted">Valeurs observées à l’entraînement. Laissez vide une gomme que vous n’utiliserez pas. Les deux champs d’une gomme vont ensemble. Cochez « Obligatoire » si le règlement impose de l’utiliser au moins une fois : la stratégie en tiendra compte.</p>
+    <div class="compounds">
+      <fieldset class="compound">
+        <legend>Soft <span class="muted">(tendre)</span></legend>
+        <label for="soft-lap">Temps moyen au tour</label>
+        <input id="soft-lap" type="text" inputmode="decimal" autocomplete="off" placeholder="1:45.230" aria-describedby="soft-lap-msg">
+        <p id="soft-lap-msg" class="msg" role="alert"></p>
+        <label for="soft-laps">Nombre maximal de tours à ce rythme</label>
+        <input id="soft-laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="soft-laps-msg">
+        <p id="soft-laps-msg" class="msg" role="alert"></p>
+        <label class="radio" for="soft-req"><input type="checkbox" id="soft-req"> Obligatoire pendant la course</label>
+      </fieldset>
+      <fieldset class="compound">
+        <legend>Medium <span class="muted">(moyen)</span></legend>
+        <label for="medium-lap">Temps moyen au tour</label>
+        <input id="medium-lap" type="text" inputmode="decimal" autocomplete="off" placeholder="1:45.230" aria-describedby="medium-lap-msg">
+        <p id="medium-lap-msg" class="msg" role="alert"></p>
+        <label for="medium-laps">Nombre maximal de tours à ce rythme</label>
+        <input id="medium-laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="medium-laps-msg">
+        <p id="medium-laps-msg" class="msg" role="alert"></p>
+        <label class="radio" for="medium-req"><input type="checkbox" id="medium-req"> Obligatoire pendant la course</label>
+      </fieldset>
+      <fieldset class="compound">
+        <legend>Hard <span class="muted">(dur)</span></legend>
+        <label for="hard-lap">Temps moyen au tour</label>
+        <input id="hard-lap" type="text" inputmode="decimal" autocomplete="off" placeholder="1:45.230" aria-describedby="hard-lap-msg">
+        <p id="hard-lap-msg" class="msg" role="alert"></p>
+        <label for="hard-laps">Nombre maximal de tours à ce rythme</label>
+        <input id="hard-laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="hard-laps-msg">
+        <p id="hard-laps-msg" class="msg" role="alert"></p>
+        <label class="radio" for="hard-req"><input type="checkbox" id="hard-req"> Obligatoire pendant la course</label>
+      </fieldset>
+      <fieldset class="compound">
+        <legend>Intermédiaire <span class="muted">(pluie légère)</span></legend>
+        <label for="inter-lap">Temps moyen au tour</label>
+        <input id="inter-lap" type="text" inputmode="decimal" autocomplete="off" placeholder="1:45.230" aria-describedby="inter-lap-msg">
+        <p id="inter-lap-msg" class="msg" role="alert"></p>
+        <label for="inter-laps">Nombre maximal de tours à ce rythme</label>
+        <input id="inter-laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="inter-laps-msg">
+        <p id="inter-laps-msg" class="msg" role="alert"></p>
+        <label class="radio" for="inter-req"><input type="checkbox" id="inter-req"> Obligatoire pendant la course</label>
+      </fieldset>
+      <fieldset class="compound">
+        <legend>Pluie <span class="muted">(pluie forte)</span></legend>
+        <label for="wet-lap">Temps moyen au tour</label>
+        <input id="wet-lap" type="text" inputmode="decimal" autocomplete="off" placeholder="1:45.230" aria-describedby="wet-lap-msg">
+        <p id="wet-lap-msg" class="msg" role="alert"></p>
+        <label for="wet-laps">Nombre maximal de tours à ce rythme</label>
+        <input id="wet-laps" type="text" inputmode="numeric" autocomplete="off" aria-describedby="wet-laps-msg">
+        <p id="wet-laps-msg" class="msg" role="alert"></p>
+        <label class="radio" for="wet-req"><input type="checkbox" id="wet-req"> Obligatoire pendant la course</label>
+      </fieldset>
+    </div>
+    <p id="tire-status" class="status" aria-live="polite"></p>
+    <div id="tire-derived-box" class="derived" hidden>
+      <p class="distance-label">Vérification des valeurs</p>
+      <ul id="tire-derived"></ul>
+    </div>
+    <div id="tire-warn-box" class="warn" hidden>
+      <p class="distance-label">À vérifier</p>
+      <ul id="tire-warnings"></ul>
+    </div>
+  </section>
+  <section class="strategy" aria-labelledby="strat-title">
+    <h2 id="strat-title">Stratégie proposée</h2>
+    <p id="strat-locked" class="empty"></p>
+    <div id="strat-body" hidden>
+      <div class="field">
+        <label for="margin">Marge de carburant à chaque arrêt (en tours)</label>
+        <input id="margin" type="text" inputmode="decimal" autocomplete="off" aria-describedby="margin-hint margin-msg">
+        <p id="margin-hint" class="hint">Réserve conservée dans le réservoir en arrivant aux stands. Le départ se fait réservoir plein.</p>
+        <p id="margin-msg" class="msg" role="alert"></p>
+      </div>
+      <button id="strat-propose" type="button" class="primary">Proposer une stratégie</button>
+      <p id="strat-msg" class="msg" role="alert"></p>
+      <div id="strat-result" hidden>
+        <p id="strat-stale" class="stale" hidden>Vos données ont changé depuis la dernière proposition : cliquez sur « Rétablir la stratégie proposée » pour la mettre à jour.</p>
+        <ul id="strat-summary" class="summary-list"></ul>
+        <p id="strat-compare" class="summary"></p>
+        <h3>Relais (modifiables)</h3>
+        <p class="muted">Changez le nombre de tours ou les pneus de chaque relais, ajoutez ou supprimez un arrêt : les temps et les contrôles se mettent à jour.</p>
+        <div id="stint-wrap" class="tbl-wrap"></div>
+        <div class="row"><button id="add-stop" type="button">Ajouter un arrêt</button></div>
+        <p id="stint-msg" class="msg" role="alert"></p>
+        <div id="strat-issues-box" class="warn" hidden>
+          <p class="distance-label">À vérifier</p>
+          <ul id="strat-issues"></ul>
+        </div>
+        <h3>Arrêts au stand</h3>
+        <div id="stop-wrap" class="tbl-wrap"></div>
+        <h3>Comparaison avec une seule gomme</h3>
+        <div id="alt-wrap" class="tbl-wrap"></div>
+        <p class="muted">Hypothèses : temps au tour constants pour chaque gomme ; temps d’un arrêt = passage au stand + changement de pneus éventuel + ravitaillement (additionnés) ; ravitaillement limité au nécessaire jusqu’à l’arrêt suivant, plus la marge.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="js/tracks.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/strategy.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
